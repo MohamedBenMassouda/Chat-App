@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:true_chat_app/utils/message_tile.dart';
 import 'package:true_chat_app/utils/show_messages.dart';
 
 class ChatPage extends StatefulWidget {
@@ -73,6 +72,20 @@ class _ChatPageState extends State<ChatPage> {
               ),
               IconButton(
                 onPressed: () {
+                  if (messageController.text.trim().isEmpty) {
+                    return;
+                  }
+
+                  db.collection("chats").doc(widget.friend["chatId"]).update({
+                    "messages": FieldValue.arrayUnion([
+                      {
+                        "message": messageController.text.trim(),
+                        "uid": user.uid,
+                      }
+                    ])
+                  });
+                  focusNode.requestFocus();
+
                   messageController.clear();
                 },
                 icon: const Icon(Icons.send),
