@@ -19,11 +19,31 @@ class _HomePageState extends State<HomePage> {
       .doc(FirebaseAuth.instance.currentUser!.uid)
       .snapshots();
 
+  bool isDarkMode = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Chats'),
+        actions: [
+          IconButton(
+            onPressed: () {
+              setState(() {
+                isDarkMode = !isDarkMode;
+                if (isDarkMode) {
+                  
+                } else {
+                  
+                }
+              });
+            },
+            icon: Icon(
+              !isDarkMode ? Icons.light_mode : Icons.dark_mode,
+              color: Colors.white,
+            ),
+          ),
+        ],
       ),
       drawer: const MyDrawer(),
       body: ShowConversations(friendsList: friendsList),

@@ -13,7 +13,6 @@ class MyDrawer extends StatefulWidget {
 
 class _MyDrawerState extends State<MyDrawer> {
   User? user = FirebaseAuth.instance.currentUser;
-  bool isDarkMode = false;
 
   @override
   Widget build(BuildContext context) {
@@ -23,46 +22,36 @@ class _MyDrawerState extends State<MyDrawer> {
           SizedBox(
             height: 150,
             child: DrawerHeader(
+              decoration: BoxDecoration(
+                color: Theme.of(context).primaryColor,
+              ),
+              padding: const EdgeInsets.all(10),
               child: Row(
                 children: [
-                  user != null? 
-                    Row(
-                      children: [
-                        CircleAvatar(
-                          radius: 25,
-                          backgroundImage: NetworkImage(
-                            user!.photoURL ?? "",
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                  user != null
+                      ? Row(
                           children: [
-                            Text(
-                              user!.displayName ?? "",
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
+                            CircleAvatar(
+                              radius: 25,
+                              backgroundImage: NetworkImage(
+                                user!.photoURL ?? "",
                               ),
                             ),
-                          ]
+                            const SizedBox(width: 10),
+                            Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    user!.displayName ?? "",
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ])
+                          ],
                         )
-                      ],
-                    ) : const SizedBox(),
-
-                    const Spacer(),
-
-                    // IconButton(
-                    //   onPressed: () {
-                    //     Navigator.pop(context);
-                    //   },
-                    //   icon: Icon(
-                    //     !isDarkMode ?
-                    //     Icons.light_mode :
-                    //     Icons.dark_mode,
-                    //     color: Colors.white,
-                    //   ),
-                    // ),
+                      : const SizedBox(),
                 ],
               ),
             ),
@@ -79,25 +68,18 @@ class _MyDrawerState extends State<MyDrawer> {
               Navigator.pop(context);
             },
           ),
-
           const Spacer(),
-
           ListTile(
             title: Row(
               children: const [
                 Icon(
-                    Icons.logout,
-                    color: Colors.red,
+                  Icons.logout,
+                  color: Colors.red,
                 ),
-
                 SizedBox(width: 10),
-
                 Text(
                   'Logout',
-                  style: TextStyle(
-                    color: Colors.red,
-                    fontSize: 15
-                  ),
+                  style: TextStyle(color: Colors.red, fontSize: 15),
                 )
               ],
             ),

@@ -85,6 +85,7 @@ class _ChatPageState extends State<ChatPage> {
                       }
                     ])
                   });
+                  
                   focusNode.requestFocus();
 
                   messageController.clear();
