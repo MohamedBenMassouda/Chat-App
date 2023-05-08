@@ -74,7 +74,7 @@ class _ContactPageState extends State<ContactPage> {
                         controller: emailController,
                         decoration: const InputDecoration(
                           border: OutlineInputBorder(),
-                          labelText: 'Email',
+                          labelText: 'Email (optional)',
                         ),
                       ),
                       const SizedBox(height: 20),
@@ -96,12 +96,19 @@ class _ContactPageState extends State<ContactPage> {
                           }
 
                           // Search for the user with the given email and username
-                          final querySnapshot = FirebaseFirestore.instance
-                              .collection('users')
-                              .where('email', isEqualTo: emailController.text)
-                              .where('displayName',
-                                  isEqualTo: usernameController.text)
-                              .get();
+                          final querySnapshot = emailController.text != ""
+                              ? FirebaseFirestore.instance
+                                  .collection('users')
+                                  .where('email',
+                                      isEqualTo: emailController.text)
+                                  .where('displayName',
+                                      isEqualTo: usernameController.text)
+                                  .get()
+                              : FirebaseFirestore.instance
+                                  .collection('users')
+                                  .where('displayName',
+                                      isEqualTo: usernameController.text)
+                                  .get();
 
                           querySnapshot.then((value) async {
                             if (value.docs.isNotEmpty) {
@@ -117,10 +124,8 @@ class _ContactPageState extends State<ContactPage> {
                                     value.get('friends') as List<dynamic>;
                                 for (final friend in friends) {
                                   if (friend['uid'] == friendUid) {
-                                    MySnackBar(
-                                      context,
-                                      "You are already friends with this user"
-                                    );
+                                    MySnackBar(context,
+                                        "You are already friends with this user");
                                     return;
                                   }
                                 }
@@ -151,7 +156,7 @@ class _ContactPageState extends State<ContactPage> {
                                   ])
                                 });
 
-                                await FirebaseFirestore.instance
+                                FirebaseFirestore.instance
                                     .collection('users')
                                     .doc(friendUid)
                                     .update({

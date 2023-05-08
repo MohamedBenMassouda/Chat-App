@@ -1,8 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:true_chat_app/pages/contact_page.dart';
-import 'package:true_chat_app/utils/message_tile.dart';
+import 'package:true_chat_app/pages/login_page.dart';
 import 'package:true_chat_app/utils/my_drawer.dart';
+import 'package:true_chat_app/utils/show_conversations.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -12,6 +14,11 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final Stream<DocumentSnapshot<Map<String, dynamic>>> friendsList = FirebaseFirestore.instance
+      .collection('users')
+      .doc(FirebaseAuth.instance.currentUser!.uid)
+      .snapshots();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,10 +26,7 @@ class _HomePageState extends State<HomePage> {
         title: const Text('Chats'),
       ),
       drawer: const MyDrawer(),
-      body: MessageTile(
-        uid: FirebaseAuth.instance.currentUser!.uid,
-        message: "Hello",
-      ),
+      body: ShowConversations(friendsList: friendsList),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(

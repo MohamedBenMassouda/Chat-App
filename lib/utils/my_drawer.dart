@@ -52,17 +52,17 @@ class _MyDrawerState extends State<MyDrawer> {
 
                     const Spacer(),
 
-                    IconButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      icon: Icon(
-                        !isDarkMode ?
-                        Icons.light_mode :
-                        Icons.dark_mode,
-                        color: Colors.white,
-                      ),
-                    ),
+                    // IconButton(
+                    //   onPressed: () {
+                    //     Navigator.pop(context);
+                    //   },
+                    //   icon: Icon(
+                    //     !isDarkMode ?
+                    //     Icons.light_mode :
+                    //     Icons.dark_mode,
+                    //     color: Colors.white,
+                    //   ),
+                    // ),
                 ],
               ),
             ),
@@ -103,7 +103,6 @@ class _MyDrawerState extends State<MyDrawer> {
             ),
             onTap: () {
               FirebaseAuth.instance.signOut();
-              GoogleSignIn().signOut();
 
               Navigator.pushReplacement(
                 context,

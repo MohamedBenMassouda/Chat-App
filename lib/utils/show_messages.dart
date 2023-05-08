@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:true_chat_app/utils/message_tile.dart';
 
@@ -11,6 +12,25 @@ class ShowMessages extends StatelessWidget {
     required this.stream,
     required this.chatId,
   });
+
+  void deleteMessage(messageId, message, uid) {
+    if (uid != FirebaseAuth.instance.currentUser!.uid) {
+      return;
+    } else {
+      FirebaseFirestore.instance.collection("chats").doc(chatId).update({
+        "messages": FieldValue.arrayRemove([
+          {
+            "message": message,
+            "uid": uid,
+          }
+        ])
+      });
+    }
+  }
+
+  void edit() {}
+
+  void copy() {}
 
   @override
   Widget build(BuildContext context) {
@@ -30,13 +50,22 @@ class ShowMessages extends StatelessWidget {
         }
 
         final messages = snapshot.data!.get("messages");
-      
+
         return ListView.builder(
           itemCount: messages.length,
           itemBuilder: (context, index) {
             return MessageTile(
               message: messages[index]["message"],
               uid: messages[index]["uid"],
+              delete: () {
+                deleteMessage(
+                  index,
+                  messages[index]["message"],
+                  messages[index]["uid"]
+                );
+              },
+              edit: edit,
+              copy: copy,
             );
           },
         );

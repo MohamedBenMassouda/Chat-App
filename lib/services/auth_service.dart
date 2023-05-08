@@ -29,7 +29,11 @@ class AuthManager {
       return;
     }
 
-    saveUserToDatabase(user);
+    FirebaseFirestore.instance.collection("users").doc(user.uid).get().then((value) async {
+      if (!value.exists) {
+        await saveUserToDatabase(user);
+      }
+    });
 
     await googleSignIn.disconnect();
   }
@@ -49,7 +53,6 @@ class AuthManager {
       "photoURL": user.photoURL,
       "emailVerified": user.emailVerified,
       "friends": [],
-      "chats": [],
     });
   }
 }
