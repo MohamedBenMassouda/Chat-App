@@ -1,9 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:true_chat_app/pages/add_group_page.dart';
 import 'package:true_chat_app/utils/friend_tile.dart';
 import 'package:true_chat_app/utils/generateUID.dart';
 import 'package:true_chat_app/utils/my_snack_bar.dart';
+import 'package:true_chat_app/utils/show_friends.dart';
 
 class ContactPage extends StatefulWidget {
   const ContactPage({super.key});
@@ -20,39 +22,17 @@ class _ContactPageState extends State<ContactPage> {
 
   @override
   Widget build(BuildContext context) {
-    final friendsList = FirebaseFirestore.instance
-        .collection('users')
-        .doc(user.uid)
-        .snapshots();
     return ScaffoldMessenger(
       key: scaffoldMessengerState,
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Contacts'),
         ),
-        body: StreamBuilder<DocumentSnapshot>(
-          stream: friendsList,
-          builder: (context, snapshot) {
-            if (snapshot.hasError) {
-              return const Center(
-                child: Text('Something went wrong'),
-              );
-            }
-
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            }
-
-            final friends = snapshot.data!.get('friends') as List<dynamic>;
-            return ListView.builder(
-              itemCount: friends.length,
-              itemBuilder: (context, index) {
-                return FriendTile(friend: friends[index]);
-              },
-            );
-          },
+        body: Column(
+          children: [
+            const AddGroup(),
+            ShowFriends(),
+          ],
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
@@ -71,14 +51,6 @@ class _ContactPageState extends State<ContactPage> {
                       ),
                       const SizedBox(height: 20),
                       TextField(
-                        controller: emailController,
-                        decoration: const InputDecoration(
-                          border: OutlineInputBorder(),
-                          labelText: 'Email (optional)',
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      TextField(
                         controller: usernameController,
                         decoration: const InputDecoration(
                           border: OutlineInputBorder(),
@@ -86,10 +58,17 @@ class _ContactPageState extends State<ContactPage> {
                         ),
                       ),
                       const SizedBox(height: 20),
+                      TextField(
+                        controller: emailController,
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'Email (optional)',
+                        ),
+                      ),
+                      const SizedBox(height: 20),
                       ElevatedButton(
                         onPressed: () {
-                          if (emailController.text.trim().isEmpty ||
-                              usernameController.text.trim().isEmpty) {
+                          if (usernameController.text.trim().isEmpty) {
                             MySnackBar(
                                 context, "Please fill in all the fields");
                             return;
@@ -191,6 +170,40 @@ class _ContactPageState extends State<ContactPage> {
             );
           },
           child: const Icon(Icons.person_add_alt_1),
+        ),
+      ),
+    );
+  }
+}
+
+class AddGroup extends StatelessWidget {
+  const AddGroup({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) =>  AddGroupPage()
+          )
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.fromLTRB(30, 10, 0, 10),
+        child: Row(
+          children: const [
+            Icon(Icons.group_add),
+            SizedBox(width: 10),
+            Text(
+              'Add a group',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
         ),
       ),
     );

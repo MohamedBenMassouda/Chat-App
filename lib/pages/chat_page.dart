@@ -77,6 +77,7 @@ class _ChatPageState extends State<ChatPage> {
                   }
 
                   db.collection("chats").doc(widget.friend["chatId"]).update({
+                    "lastMessageTime": DateTime.now(),
                     "messages": FieldValue.arrayUnion([
                       {
                         "message": messageController.text,

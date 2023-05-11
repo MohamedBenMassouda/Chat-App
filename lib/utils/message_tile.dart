@@ -5,6 +5,7 @@ import 'package:true_chat_app/utils/my_text_buton.dart';
 
 class MessageTile extends StatelessWidget {
   final String uid;
+  final String sender;
   final String message;
   VoidCallback delete;
   VoidCallback edit;
@@ -13,6 +14,7 @@ class MessageTile extends StatelessWidget {
   MessageTile({
     super.key,
     required this.uid,
+    this.sender = "",
     required this.message,
     required this.delete,
     required this.edit,

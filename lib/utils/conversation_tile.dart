@@ -32,13 +32,14 @@ class ConversationTile extends StatelessWidget {
 
       // :$second $day/$month/$year
       return "$hour:$minute";
-    } else if (timestamp.day == DateTime.now().subtract(const Duration(days: 1)).day) {
+    } else if (timestamp.day ==
+        DateTime.now().subtract(const Duration(days: 1)).day) {
       return "Yesterday";
     } else {
       String day = timestamp.day.toString();
       String month = timestamp.month.toString();
       String year = timestamp.year.toString();
-      
+
       switch (month) {
         case "1":
           month = "Jan";
@@ -92,56 +93,54 @@ class ConversationTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-        padding: const EdgeInsets.all(8),
-        child: ListTile(
-          leading: CircleAvatar(
-            backgroundImage: NetworkImage(photoURL),
-          ),
-          title: Text(name),
-          subtitle: StreamBuilder(
-            stream: chatDoc.snapshots(),
-            builder: (context, snapshot) {
-              if (snapshot.hasError) {
-                return const Text('Something went wrong');
-              }
+    return ListTile(
+      leading: CircleAvatar(
+        backgroundImage: NetworkImage(photoURL),
+      ),
+      title: Text(name),
+      subtitle: StreamBuilder(
+        stream: chatDoc.snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return const Text('Something went wrong');
+          }
 
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Text('Loading');
-              }
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Text('Loading');
+          }
 
-              final messages = snapshot.data!.get("messages") as List<dynamic>;
+          final messages = snapshot.data!.get("messages") as List<dynamic>;
 
-              if (messages.isEmpty) {
-                return const Text("No messages yet");
-              }
+          if (messages.isEmpty) {
+            return const Text("No messages yet");
+          }
 
-              final lastMessage = messages.last["message"];
-              final lastMessageSender = messages.last["uid"] == friend["uid"]
-                  ? friend["displayName"]
-                  : "You";
+          final lastMessage = messages.last["message"];
+          final lastMessageSender = messages.last["uid"] == friend["uid"]
+              ? friend["displayName"]
+              : "You";
 
-              return Row(
-                children: [
-                  Text("$lastMessageSender: $lastMessage"),
-                  const Spacer(),
-                  Text(
-                    displayTimeStamp(messages.last["timestamp"].toDate()),
-                  ),
-                ],
-              );
-            },
-          ),
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ChatPage(
-                  friend: friend,
-                ),
+          return Row(
+            children: [
+              Text("$lastMessageSender: $lastMessage"),
+              const Spacer(),
+              Text(
+                displayTimeStamp(messages.last["timestamp"].toDate()),
               ),
-            );
-          },
-        ));
+            ],
+          );
+        },
+      ),
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ChatPage(
+              friend: friend,
+            ),
+          ),
+        );
+      },
+    );
   }
 }
