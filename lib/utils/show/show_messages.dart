@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:true_chat_app/utils/tiles/message_tile.dart';
 
 class ShowMessages extends StatelessWidget {
@@ -14,7 +13,7 @@ class ShowMessages extends StatelessWidget {
     required this.chatId,
   });
 
-  void deleteMessage(messageId, message, uid, timestamp) {
+  void deleteMessage(messageId, message, uid, photoURL, timestamp) {
     if (uid != FirebaseAuth.instance.currentUser!.uid) {
       return;
     } else {
@@ -23,6 +22,7 @@ class ShowMessages extends StatelessWidget {
           {
             "message": message,
             "timestamp": timestamp,
+            "photoURL": photoURL,
             "uid": uid,
           }
         ])
@@ -57,11 +57,13 @@ class ShowMessages extends StatelessWidget {
             return MessageTile(
               message: messages[index]["message"],
               uid: messages[index]["uid"],
+              photoURL: messages[index]["photoURL"],
               delete: () {
                 deleteMessage(
                   index,
                   messages[index]["message"],
                   messages[index]["uid"],
+                  messages[index]["photoURL"],
                   messages[index]["timestamp"],
                 );
               },

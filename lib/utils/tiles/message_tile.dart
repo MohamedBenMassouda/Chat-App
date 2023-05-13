@@ -8,6 +8,7 @@ class MessageTile extends StatelessWidget {
   final String uid;
   final String sender;
   final String message;
+  final String photoURL;
   VoidCallback delete;
   VoidCallback edit;
 
@@ -15,6 +16,7 @@ class MessageTile extends StatelessWidget {
     super.key,
     required this.uid,
     this.sender = "",
+    this.photoURL = "",
     required this.message,
     required this.delete,
     required this.edit,
@@ -86,6 +88,19 @@ class MessageTile extends StatelessWidget {
           mainAxisAlignment:
               isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
           children: [
+            if (!isMe)
+              Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: CircleAvatar(
+                  radius: 15,
+                  backgroundImage: NetworkImage(
+                    photoURL,
+                  ),
+                ),
+              ),
+
+            !isMe ? const SizedBox(width: 5) : const SizedBox(),
+
             Container(
               decoration: BoxDecoration(
                 color: isMe

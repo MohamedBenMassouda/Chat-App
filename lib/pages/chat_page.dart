@@ -63,6 +63,7 @@ class _ChatPageState extends State<ChatPage> {
                     {
                       "message": messageController.text,
                       "uid": user.uid,
+                      "photoURL": user.photoURL,
                       "timestamp": DateTime.now(),
                     }
                   ])

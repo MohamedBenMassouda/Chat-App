@@ -102,6 +102,7 @@ class _GroupChatPageState extends State<GroupChatPage> {
                         message: messages[index]["message"],
                         uid: messages[index]["uid"],
                         sender: messages[index]["sender"],
+                        photoURL: messages[index]["photoURL"],
                         edit: () {},
                         delete: () {
                           deleteMessage(
@@ -135,6 +136,7 @@ class _GroupChatPageState extends State<GroupChatPage> {
                   {
                     "uid": FirebaseAuth.instance.currentUser!.uid,
                     "sender": FirebaseAuth.instance.currentUser!.displayName,
+                    "photoURL": FirebaseAuth.instance.currentUser!.photoURL,
                     "message": messageController.text,
                     "timestamp": DateTime.now(),
                   }
