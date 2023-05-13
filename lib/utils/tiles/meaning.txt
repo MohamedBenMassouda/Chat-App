@@ -1,0 +1,2 @@
+Tile is just a blueprint to some design.
+Same as function in programming it's designed to be used more than one time and to in different places

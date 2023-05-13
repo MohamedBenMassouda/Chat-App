@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:true_chat_app/utils/conversation_tile.dart';
+import 'package:true_chat_app/utils/tiles/conversation_tile.dart';
 
 class ShowConversations extends StatelessWidget {
   final Stream<DocumentSnapshot<Map<String, dynamic>>> friendsList;

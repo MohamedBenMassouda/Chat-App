@@ -5,8 +5,8 @@ import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:true_chat_app/pages/group_chat_page.dart';
-import 'package:true_chat_app/utils/generateUID.dart';
+import 'package:true_chat_app/pages/groups/group_chat_page.dart';
+import 'package:true_chat_app/functions/generateUID.dart';
 import 'package:true_chat_app/utils/my_snack_bar.dart';
 
 class FinishAddGroupPage extends StatefulWidget {
@@ -23,7 +23,7 @@ class FinishAddGroupPage extends StatefulWidget {
 }
 
 class _FinishAddGroupPageState extends State<FinishAddGroupPage> {
-  String groupPhotoURL = "";
+  String groupPicture = "";
 
   TextEditingController groupNameController = TextEditingController();
 
@@ -44,7 +44,7 @@ class _FinishAddGroupPageState extends State<FinishAddGroupPage> {
         final file = File(result.files.single.path!);
 
         setState(() {
-          groupPhotoURL = file.toString();
+          groupPicture = file.toString();
         });
         // Upload the file to the database
       }
@@ -53,6 +53,8 @@ class _FinishAddGroupPageState extends State<FinishAddGroupPage> {
 
   @override
   Widget build(BuildContext context) {
+    final uid = generateUID();
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("New Group"),
@@ -63,9 +65,9 @@ class _FinishAddGroupPageState extends State<FinishAddGroupPage> {
             onTap: () {
               getGroupProfilePicture();
             },
-            child: groupPhotoURL != ""
+            child: groupPicture != ""
                 ? CircleAvatar(
-                    backgroundImage: NetworkImage(groupPhotoURL),
+                    backgroundImage: NetworkImage(groupPicture),
                   )
                 : const CircleAvatar(
                     backgroundColor: Colors.blue,
@@ -116,17 +118,17 @@ class _FinishAddGroupPageState extends State<FinishAddGroupPage> {
             return;
           }
 
-          final uid = generateUID();
           await FirebaseFirestore.instance.collection("groups").doc(uid).set({
             "groupName": groupNameController.text,
-            "groupPhotoURL": groupPhotoURL,
+            "groupPicture": groupPicture,
             "owner": {
               "uid": FirebaseAuth.instance.currentUser!.uid,
               "displayName": FirebaseAuth.instance.currentUser!.displayName!,
               "photoURL": FirebaseAuth.instance.currentUser!.photoURL!,
             },
             "members": widget.selectedFriends,
-            "messages": []
+            "messages": [],
+            "groupID": uid,
           });
 
           for (var user in widget.selectedFriends) {
@@ -134,18 +136,43 @@ class _FinishAddGroupPageState extends State<FinishAddGroupPage> {
                 .collection("users")
                 .doc(user["uid"])
                 .update({
-              "groups": FieldValue.arrayUnion([uid])
-            });
+                  "groups": FieldValue.arrayUnion([
+                    {
+                      "groupName": groupNameController.text,
+                      "groupPicture": groupPicture,
+                      "groupID": uid,
+                    }
+                  ])
+                });
           }
 
+          await FirebaseFirestore.instance
+              .collection("users")
+              .doc(FirebaseAuth.instance.currentUser!.uid)
+              .update({
+                "groups": FieldValue.arrayUnion([
+                  {
+                    "groupName": groupNameController.text,
+                    "groupPicture": groupPicture,
+                    "groupID": uid,
+                  }
+                ])
+              });
+
           final Stream<DocumentSnapshot<Map<String, dynamic>>> group =
-              FirebaseFirestore.instance.collection("groups").doc(uid).snapshots();
+              FirebaseFirestore.instance
+                  .collection("groups")
+                  .doc(uid)
+                  .snapshots();
 
           // ignore: use_build_context_synchronously
-          Navigator.push(
+          Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-                builder: (context) => GroupChatPage(group: group)),
+                builder: (context) => GroupChatPage(
+                      group: group,
+                      groupName: groupNameController.text,
+                    )),
           );
         },
         child: const Icon(Icons.check),

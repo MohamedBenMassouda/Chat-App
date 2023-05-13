@@ -1,7 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:true_chat_app/utils/show_messages.dart';
+import 'package:true_chat_app/utils/my_text_field.dart';
+import 'package:true_chat_app/utils/show/show_messages.dart';
 
 class ChatPage extends StatefulWidget {
   final Map<String, dynamic> friend;
@@ -52,49 +53,21 @@ class _ChatPageState extends State<ChatPage> {
               chatId: widget.friend["chatId"],
             ),
           ),
-          Row(
-            children: [
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: TextField(
-                    controller: messageController,
-                    onTapOutside: (event) {
-                      focusNode.unfocus();
-                    },
-                    focusNode: focusNode,
-                    decoration: const InputDecoration(
-                      border: InputBorder.none,
-                      hintText: 'Type a message',
-                    ),
-                  ),
-                ),
-              ),
-              IconButton(
-                onPressed: () {
-                  if (messageController.text.trim().isEmpty) {
-                    return;
-                  }
-
-                  db.collection("chats").doc(widget.friend["chatId"]).update({
-                    "lastMessageTime": DateTime.now(),
-                    "messages": FieldValue.arrayUnion([
-                      {
-                        "message": messageController.text,
-                        "uid": user.uid,
-                        "timestamp": DateTime.now(),
-                      }
-                    ])
-                  });
-                  
-                  focusNode.requestFocus();
-
-                  messageController.clear();
-                },
-                icon: const Icon(Icons.send),
-              ),
-            ],
-          )
+          MyTextField(
+              messageController: messageController,
+              focusNode: focusNode,
+              onPressed: () {
+                db.collection("chats").doc(widget.friend["chatId"]).update({
+                  "lastMessageTime": DateTime.now(),
+                  "messages": FieldValue.arrayUnion([
+                    {
+                      "message": messageController.text,
+                      "uid": user.uid,
+                      "timestamp": DateTime.now(),
+                    }
+                  ])
+                });
+              }),
         ],
       ),
     );

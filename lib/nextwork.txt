@@ -1,0 +1,8 @@
+Groups:
+    - Alter the message tile so that we can use it in group chats and make it so the other users can see their name
+    - Make the group conversations appear in the home page
+    - Make it that they can add members even after creating the group and able to make a group picture
+
+
+HomePage:
+    - Add a search option that lets the user filter their friends

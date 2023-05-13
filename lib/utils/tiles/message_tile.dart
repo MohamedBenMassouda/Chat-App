@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:true_chat_app/utils/my_snack_bar.dart';
 import 'package:true_chat_app/utils/my_text_buton.dart';
 
@@ -9,7 +10,6 @@ class MessageTile extends StatelessWidget {
   final String message;
   VoidCallback delete;
   VoidCallback edit;
-  VoidCallback copy;
 
   MessageTile({
     super.key,
@@ -18,7 +18,6 @@ class MessageTile extends StatelessWidget {
     required this.message,
     required this.delete,
     required this.edit,
-    required this.copy,
   });
 
   @override
@@ -57,7 +56,9 @@ class MessageTile extends StatelessWidget {
                       MyTextButton(
                         text: "Copy",
                         icon: const Icon(Icons.copy),
-                        onPressed: copy,
+                        onPressed: () {
+                          Clipboard.setData(ClipboardData(text: message));
+                        },
                       ),
                       MyTextButton(
                         text: "Edit",

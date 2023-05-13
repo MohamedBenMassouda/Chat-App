@@ -1,11 +1,19 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:true_chat_app/pages/finish_group_page.dart';
+import 'package:true_chat_app/pages/groups/finish_group_page.dart';
 import 'package:true_chat_app/utils/my_snack_bar.dart';
-import 'package:true_chat_app/utils/show_friends.dart';
+import 'package:true_chat_app/utils/show/show_friends.dart';
 
 class AddGroupPage extends StatefulWidget {
-  const AddGroupPage({super.key});
+  final bool isAdding;
+  final List members;
+  final Function(List<Map<String, String>>)? onAdd;
+
+  const AddGroupPage({
+    super.key,
+    this.isAdding = false,
+    this.members = const [],
+    this.onAdd,
+  });
 
   @override
   State<AddGroupPage> createState() => _AddGroupPageState();
@@ -24,8 +32,8 @@ class _AddGroupPageState extends State<AddGroupPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: selectedFriends.length > 0
-            ? Text("${selectedFriends.length} selected")
+        title: widget.isAdding
+            ? const Text("Add Friends to Group")
             : const Text("Add Group"),
       ),
       body: Column(
@@ -49,6 +57,8 @@ class _AddGroupPageState extends State<AddGroupPage> {
             friendName: friendName.text,
             isSelecting: true,
             selectedFriends: selectedFriends,
+            isAdding: widget.isAdding,
+            members: widget.members,
           ),
         ],
       ),
@@ -58,7 +68,14 @@ class _AddGroupPageState extends State<AddGroupPage> {
             MySnackBar(context, "Please select at least one friend");
             return;
           }
-          
+
+          if (widget.isAdding) {
+            widget.onAdd!(selectedFriends);
+
+            Navigator.pop(context);
+            return;
+          }
+
           Navigator.push(
               context,
               MaterialPageRoute(
@@ -67,7 +84,9 @@ class _AddGroupPageState extends State<AddGroupPage> {
               )
           );
         },
-        child: const Icon(Icons.arrow_right_alt_sharp),
+        child: widget.isAdding
+            ? const Icon(Icons.add)
+            : const Icon(Icons.arrow_right_alt_sharp),
       ),
     );
   }

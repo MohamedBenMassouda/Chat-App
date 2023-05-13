@@ -1,18 +1,24 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:true_chat_app/utils/friend_tile.dart';
+import 'package:true_chat_app/utils/tiles/friend_tile.dart';
 
 class ShowFriends extends StatelessWidget {
   final String friendName;
   final bool isSelecting;
   List<Map<String, String>>? selectedFriends;
+  // Only true when adding friends to a group that already exists
+  final bool isAdding;
+  // Contains the members of the group
+  final List members;
 
   ShowFriends({
     super.key,
     this.friendName = "",
     this.isSelecting = false,
     this.selectedFriends,
+    this.isAdding = false,
+    this.members = const [],
   });
 
   var friendsList = FirebaseFirestore.instance
@@ -54,8 +60,18 @@ class ShowFriends extends StatelessWidget {
 
           var friends = snapshot.data!.get('friends') as List<dynamic>;
           final f = mentionedFriends(friends, friendName);
+          
+          if (isAdding) {
+            for (final member in members) {
+              f.removeWhere((friend) => friend["uid"] == member["uid"]);
+            }
+          }
 
-          if (f.isNotEmpty) {
+          if (f.isEmpty) {
+            return const Center(
+              child: Text('No friends'),
+            );
+          } else {
             friends = f;
           }
           

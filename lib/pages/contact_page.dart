@@ -1,11 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:true_chat_app/pages/add_group_page.dart';
-import 'package:true_chat_app/utils/friend_tile.dart';
-import 'package:true_chat_app/utils/generateUID.dart';
+import 'package:true_chat_app/pages/groups/add_group_page.dart';
+import 'package:true_chat_app/utils/tiles/friend_tile.dart';
+import 'package:true_chat_app/functions/generateUID.dart';
 import 'package:true_chat_app/utils/my_snack_bar.dart';
-import 'package:true_chat_app/utils/show_friends.dart';
+import 'package:true_chat_app/utils/show/show_friends.dart';
 
 class ContactPage extends StatefulWidget {
   const ContactPage({super.key});

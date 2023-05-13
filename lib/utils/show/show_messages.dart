@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:true_chat_app/utils/message_tile.dart';
+import 'package:true_chat_app/utils/tiles/message_tile.dart';
 
 class ShowMessages extends StatelessWidget {
   final Stream<DocumentSnapshot<Map<String, dynamic>>> stream;
@@ -31,10 +31,6 @@ class ShowMessages extends StatelessWidget {
   }
 
   void edit() {}
-
-  void copy(message) {
-    Clipboard.setData(ClipboardData(text: message));
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -70,9 +66,6 @@ class ShowMessages extends StatelessWidget {
                 );
               },
               edit: edit,
-              copy: () {
-                copy(messages[index]["message"]);
-              } ,
             );
           },
         );
