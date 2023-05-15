@@ -54,21 +54,23 @@ class _ChatPageState extends State<ChatPage> {
             ),
           ),
           MyTextField(
-              messageController: messageController,
-              focusNode: focusNode,
-              onPressed: () {
-                db.collection("chats").doc(widget.friend["chatId"]).update({
-                  "lastMessageTime": DateTime.now(),
-                  "messages": FieldValue.arrayUnion([
-                    {
-                      "message": messageController.text,
-                      "uid": user.uid,
-                      "photoURL": user.photoURL,
-                      "timestamp": DateTime.now(),
-                    }
-                  ])
-                });
-              }),
+            messageController: messageController,
+            focusNode: focusNode,
+            onPressed: () {
+              db.collection("chats").doc(widget.friend["chatId"]).update({
+                "lastMessageTime": DateTime.now(),
+                "messages": FieldValue.arrayUnion([
+                  {
+                    "message": messageController.text,
+                    "uid": user.uid,
+                    "photoURL": user.photoURL,
+                    "timestamp": DateTime.now(),
+                    "read": false,
+                  }
+                ])
+              });
+            }
+          ),
         ],
       ),
     );

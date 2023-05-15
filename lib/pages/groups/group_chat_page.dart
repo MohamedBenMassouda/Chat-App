@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:true_chat_app/pages/groups/group_info_page.dart';
+import 'package:true_chat_app/utils/day_indicator.dart';
 import 'package:true_chat_app/utils/my_text_field.dart';
 import 'package:true_chat_app/utils/tiles/message_tile.dart';
 
@@ -98,21 +99,45 @@ class _GroupChatPageState extends State<GroupChatPage> {
                   return ListView.builder(
                     itemCount: messages.length,
                     itemBuilder: (context, index) {
-                      return MessageTile(
-                        message: messages[index]["message"],
-                        uid: messages[index]["uid"],
-                        sender: messages[index]["sender"],
-                        photoURL: messages[index]["photoURL"],
-                        edit: () {},
-                        delete: () {
-                          deleteMessage(
-                            index,
-                            messages[index]["message"],
-                            messages[index]["uid"],
-                            messages[index]["sender"],
-                            messages[index]["timestamp"],
-                          );
-                        },
+                      String currentDate = messages[index]["timestamp"]
+                          .toDate()
+                          .toString()
+                          .substring(0, 10);
+
+                      bool showDayIndicator = true;
+
+                      if (index > 0) {
+                        String previousDate = messages[index - 1]["timestamp"]
+                            .toDate()
+                            .toString()
+                            .substring(0, 10);
+
+                        if (currentDate == previousDate) {
+                          showDayIndicator = false;
+                        }
+                      }
+
+                      return Column(
+                        children: [
+                          showDayIndicator ? DayIndicator(day: currentDate) : Container(),
+
+                          MessageTile(
+                            message: messages[index]["message"],
+                            uid: messages[index]["uid"],
+                            sender: messages[index]["sender"],
+                            photoURL: messages[index]["photoURL"],
+                            edit: () {},
+                            delete: () {
+                              deleteMessage(
+                                index,
+                                messages[index]["message"],
+                                messages[index]["uid"],
+                                messages[index]["sender"],
+                                messages[index]["timestamp"],
+                              );
+                            },
+                          ),
+                        ],
                       );
                     },
                   );

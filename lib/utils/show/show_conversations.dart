@@ -32,6 +32,15 @@ class ShowConversations extends StatelessWidget {
         return ListView.builder(
           itemCount: friends.length,
           itemBuilder: (context, index) {
+            final chatRef = FirebaseFirestore.instance
+                .collection("chats")
+                .doc(friends[index]["chatId"])
+                .snapshots();
+
+            bool read = true;
+
+
+
             return ConversationTile(
               name: friends[index]["displayName"],
               friend: friends[index],
@@ -39,6 +48,7 @@ class ShowConversations extends StatelessWidget {
               chatDoc: FirebaseFirestore.instance
                   .collection("chats")
                   .doc(friends[index]["chatId"]),
+              read: read,
             );
           },
         );
