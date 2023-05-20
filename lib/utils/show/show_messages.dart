@@ -26,6 +26,7 @@ class ShowMessages extends StatelessWidget {
             "timestamp": timestamp,
             "photoURL": photoURL,
             "uid": uid,
+            "read": false,
           }
         ])
       });
@@ -51,22 +52,23 @@ class ShowMessages extends StatelessWidget {
           );
         }
 
+
         final messages = snapshot.data!.get("messages");
 
         return ListView.builder(
           itemCount: messages.length,
           itemBuilder: (context, index) {
             // After the user enters the chat it waits 3 seconds to mark the messages as read
-            if (index == 0) {
-              Future.delayed(const Duration(seconds: 3), () {
-                FirebaseFirestore.instance
-                    .collection("chats")
-                    .doc(chatId)
-                    .update({
-                      
-                    });
-                  });
-            }
+            // if (index == 0) {
+            //   Future.delayed(const Duration(seconds: 3), () {
+            //     FirebaseFirestore.instance
+            //         .collection("chats")
+            //         .doc(chatId)
+            //         .update({
+
+            //         });
+            //       });
+            // }
 
             String currentDate = messages[index]["timestamp"]
                 .toDate()
@@ -88,12 +90,14 @@ class ShowMessages extends StatelessWidget {
 
             return Column(
               children: [
-                showDayIndicator ? DayIndicator(day: currentDate) : const SizedBox(),
-
-                messages[index]["read"] == false && messages[index]["uid"] != FirebaseAuth.instance.currentUser!.uid
+                showDayIndicator
+                    ? DayIndicator(day: currentDate)
+                    : const SizedBox(),
+                messages[index]["read"] == false &&
+                        messages[index]["uid"] !=
+                            FirebaseAuth.instance.currentUser!.uid
                     ? UnreadIndicator()
                     : const SizedBox(),
-
                 MessageTile(
                   message: messages[index]["message"],
                   uid: messages[index]["uid"],

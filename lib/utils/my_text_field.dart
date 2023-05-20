@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-class MyTextField extends StatelessWidget {
+class MyTextField extends StatefulWidget {
   final TextEditingController messageController;
   final FocusNode focusNode;
   final Function() onPressed;
 
-  const MyTextField({
+  MyTextField({
     super.key,
     required this.messageController,
     required this.focusNode,
@@ -13,39 +13,74 @@ class MyTextField extends StatelessWidget {
   });
 
   @override
+  State<MyTextField> createState() => _MyTextFieldState();
+}
+
+class _MyTextFieldState extends State<MyTextField> {
+  bool isTyping = false;
+
+  @override
   Widget build(BuildContext context) {
     return Row(
       children: [
         Expanded(
           child: Padding(
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(5),
             child: TextField(
-              controller: messageController,
+              maxLines: null,
+              controller: widget.messageController,
               onTapOutside: (event) {
-                focusNode.unfocus();
+                widget.focusNode.unfocus();
               },
-              focusNode: focusNode,
+              focusNode: widget.focusNode,
               decoration: const InputDecoration(
-                border: InputBorder.none,
-                hintText: 'Type a message',
+                contentPadding: EdgeInsets.all(10),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(20)),
+                ),
+                hintText: 'Message',
               ),
+              onChanged: (value) {
+                if (value.trim().isEmpty) {
+                  setState(() {
+                    isTyping = false;
+                  });
+                } else {
+                  setState(() {
+                    isTyping = true;
+                  });
+                }
+              },
             ),
           ),
         ),
-        IconButton(
-          onPressed: () {
-            if (messageController.text.trim().isEmpty) {
-              return;
-            }
+        isTyping
+            ? IconButton(
+                onPressed: () {
+                  if (widget.messageController.text.trim().isEmpty) {
+                    return;
+                  }
 
-            onPressed();
+                  widget.onPressed();
 
-            focusNode.requestFocus();
+                  widget.focusNode.requestFocus();
 
-            messageController.clear();
-          },
-          icon: const Icon(Icons.send),
-        ),
+                  widget.messageController.clear();
+                },
+                icon: const Icon(Icons.send),
+              )
+            : Row(
+                children: [
+                  IconButton(
+                    onPressed: () {},
+                    icon: const Icon(Icons.mic),
+                  ),
+                  IconButton(
+                    onPressed: () {},
+                    icon: const Icon(Icons.photo_outlined),
+                  ),
+                ],
+              ),
       ],
     );
   }
