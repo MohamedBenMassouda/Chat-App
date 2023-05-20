@@ -143,6 +143,22 @@ class _GroupChatPageState extends State<GroupChatPage> {
                         });
                       }
 
+                      bool isCurrentMessageRead = read
+                          .contains(FirebaseAuth.instance.currentUser!.uid);
+
+                      bool isRead = true;
+
+                      if (!isCurrentMessageRead && index > 0) {
+                        bool isPreviousMessageRead = messages[index - 1]
+                            ["read"]
+                            .contains(
+                                FirebaseAuth.instance.currentUser!.uid);
+
+                        if (isPreviousMessageRead) {
+                          isRead = false;
+                        }
+                      }
+
                       String currentDate = messages[index]["timestamp"]
                           .toDate()
                           .toString()
@@ -163,7 +179,7 @@ class _GroupChatPageState extends State<GroupChatPage> {
 
                       return Column(
                         children: [
-                          read.contains(FirebaseAuth.instance.currentUser!.uid)
+                          isRead
                               ? const SizedBox()
                               : const UnreadIndicator(),
                           showDayIndicator
