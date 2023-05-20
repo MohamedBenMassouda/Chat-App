@@ -157,16 +157,17 @@ class _GroupChatPageState extends State<GroupChatPage> {
                   .collection("groups")
                   .doc(groupID)
                   .update({
-                "messages": FieldValue.arrayUnion([
-                  {
-                    "uid": FirebaseAuth.instance.currentUser!.uid,
-                    "sender": FirebaseAuth.instance.currentUser!.displayName,
-                    "photoURL": FirebaseAuth.instance.currentUser!.photoURL,
-                    "message": messageController.text,
-                    "timestamp": DateTime.now(),
-                  }
-                ])
-              });
+                    "messages": FieldValue.arrayUnion([
+                      {
+                        "uid": FirebaseAuth.instance.currentUser!.uid,
+                        "sender": FirebaseAuth.instance.currentUser!.displayName,
+                        "photoURL": FirebaseAuth.instance.currentUser!.photoURL,
+                        "message": messageController.text,
+                        "timestamp": DateTime.now(),
+                        "read": [],
+                      }
+                    ])
+                  });
 
               messageController.clear();
             },

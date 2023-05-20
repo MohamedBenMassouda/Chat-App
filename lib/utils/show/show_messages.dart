@@ -15,7 +15,7 @@ class ShowMessages extends StatelessWidget {
     required this.chatId,
   });
 
-  void deleteMessage(messageId, message, uid, photoURL, timestamp) {
+  void deleteMessage(messageId, message, uid, photoURL, timestamp, read) {
     if (uid != FirebaseAuth.instance.currentUser!.uid) {
       return;
     } else {
@@ -26,7 +26,7 @@ class ShowMessages extends StatelessWidget {
             "timestamp": timestamp,
             "photoURL": photoURL,
             "uid": uid,
-            "read": false,
+            "read": read,
           }
         ])
       });
@@ -52,23 +52,46 @@ class ShowMessages extends StatelessWidget {
           );
         }
 
-
         final messages = snapshot.data!.get("messages");
 
         return ListView.builder(
           itemCount: messages.length,
           itemBuilder: (context, index) {
-            // After the user enters the chat it waits 3 seconds to mark the messages as read
-            // if (index == 0) {
-            //   Future.delayed(const Duration(seconds: 3), () {
-            //     FirebaseFirestore.instance
-            //         .collection("chats")
-            //         .doc(chatId)
-            //         .update({
+            if (messages[index]["read"] == false &&
+                messages[index]["uid"] !=
+                    FirebaseAuth.instance.currentUser!.uid) {
+              
+              Future.delayed(const Duration(seconds: 2), () {
 
-            //         });
-            //       });
-            // }
+              });
+            
+              var updatedMessage = {
+                "message": messages[index]["message"],
+                "timestamp": messages[index]["timestamp"],
+                "photoURL": messages[index]["photoURL"],
+                "uid": messages[index]["uid"],
+                "read": true,
+              };
+
+              FirebaseFirestore.instance.runTransaction((transaction) async {
+                DocumentSnapshot snapshot = await transaction.get(
+                    FirebaseFirestore.instance.collection("chats").doc(chatId));
+
+                List<dynamic> messagesArray = snapshot.get("messages");
+
+                // Remove the message from the array
+                messagesArray.removeAt(index);
+
+                // Insert the updated message at the original index
+                messagesArray.insert(index, updatedMessage);
+
+                // Update the "messages" array field in Firestore
+                transaction.update(
+                    FirebaseFirestore.instance.collection("chats").doc(chatId),
+                    {"messages": messagesArray});
+              });
+            }
+
 
             String currentDate = messages[index]["timestamp"]
                 .toDate()
@@ -96,7 +119,7 @@ class ShowMessages extends StatelessWidget {
                 messages[index]["read"] == false &&
                         messages[index]["uid"] !=
                             FirebaseAuth.instance.currentUser!.uid
-                    ? UnreadIndicator()
+                    ? const UnreadIndicator()
                     : const SizedBox(),
                 MessageTile(
                   message: messages[index]["message"],
@@ -109,6 +132,7 @@ class ShowMessages extends StatelessWidget {
                       messages[index]["uid"],
                       messages[index]["photoURL"],
                       messages[index]["timestamp"],
+                      messages[index]["read"],
                     );
                   },
                   edit: edit,

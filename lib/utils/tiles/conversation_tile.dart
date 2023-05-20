@@ -8,7 +8,6 @@ class ConversationTile extends StatelessWidget {
   final friend;
   final String photoURL;
   final DocumentReference<Map<String, dynamic>> chatDoc;
-  final bool read;
 
   const ConversationTile({
     super.key,
@@ -16,7 +15,6 @@ class ConversationTile extends StatelessWidget {
     required this.friend,
     required this.photoURL,
     required this.chatDoc,
-    required this.read,
   });
 
   @override
@@ -25,12 +23,9 @@ class ConversationTile extends StatelessWidget {
       leading: CircleAvatar(
         backgroundImage: NetworkImage(photoURL),
       ),
-      title: Text(
-        name,
-        style: TextStyle(
-          fontWeight: read ? FontWeight.bold : FontWeight.normal,
-        )
-      ),
+      
+      title: Text(name),
+
       subtitle: StreamBuilder(
         stream: chatDoc.snapshots(),
         builder: (context, snapshot) {
@@ -49,6 +44,9 @@ class ConversationTile extends StatelessWidget {
           }
 
           final lastMessage = messages.last["message"];
+
+          final read = messages.last["read"];
+
           final lastMessageSender = messages.last["uid"] == friend["uid"]
               ? friend["displayName"]
               : "You";
@@ -58,14 +56,14 @@ class ConversationTile extends StatelessWidget {
               Text(
                 "$lastMessageSender: $lastMessage",
                 style: TextStyle(
-                  fontWeight: read ? FontWeight.bold : FontWeight.normal,
+                  fontWeight: !read ? FontWeight.bold : FontWeight.normal,
                 ),
               ),
               const Spacer(),
               Text(
                 displayTimeStamp(messages.last["timestamp"].toDate()),
                 style: TextStyle(
-                  fontWeight: read ? FontWeight.bold : FontWeight.normal,
+                  fontWeight: !read ? FontWeight.bold : FontWeight.normal,
                 ),
               ),
             ],

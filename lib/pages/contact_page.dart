@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:true_chat_app/pages/groups/add_group_page.dart';
-import 'package:true_chat_app/utils/tiles/friend_tile.dart';
 import 'package:true_chat_app/functions/generateUID.dart';
 import 'package:true_chat_app/utils/my_snack_bar.dart';
 import 'package:true_chat_app/utils/show/show_friends.dart';
@@ -115,9 +114,9 @@ class _ContactPageState extends State<ContactPage> {
                                     .collection("chats")
                                     .doc(uid)
                                     .set({
-                                  "members": [user.uid, friendUid],
-                                  "messages": [],
-                                });
+                                      "members": [user.uid, friendUid],
+                                      "messages": [],
+                                    });
 
                                 // Add the friend to the current user's friends list
                                 await FirebaseFirestore.instance
