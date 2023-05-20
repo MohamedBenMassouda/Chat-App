@@ -24,7 +24,12 @@ class ConversationTile extends StatelessWidget {
         backgroundImage: NetworkImage(photoURL),
       ),
       
-      title: Text(name),
+      title: Text(
+        name,
+        style: const TextStyle(
+          fontWeight: FontWeight.normal,
+        )
+      ),
 
       subtitle: StreamBuilder(
         stream: chatDoc.snapshots(),

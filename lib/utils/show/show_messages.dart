@@ -60,38 +60,50 @@ class ShowMessages extends StatelessWidget {
             if (messages[index]["read"] == false &&
                 messages[index]["uid"] !=
                     FirebaseAuth.instance.currentUser!.uid) {
-              
               Future.delayed(const Duration(seconds: 2), () {
+                var updatedMessage = {
+                  "message": messages[index]["message"],
+                  "timestamp": messages[index]["timestamp"],
+                  "photoURL": messages[index]["photoURL"],
+                  "uid": messages[index]["uid"],
+                  "read": true,
+                };
 
-              });
-            
-              var updatedMessage = {
-                "message": messages[index]["message"],
-                "timestamp": messages[index]["timestamp"],
-                "photoURL": messages[index]["photoURL"],
-                "uid": messages[index]["uid"],
-                "read": true,
-              };
+                FirebaseFirestore.instance.runTransaction((transaction) async {
+                  DocumentSnapshot snapshot = await transaction.get(
+                      FirebaseFirestore.instance
+                          .collection("chats")
+                          .doc(chatId));
 
-              FirebaseFirestore.instance.runTransaction((transaction) async {
-                DocumentSnapshot snapshot = await transaction.get(
-                    FirebaseFirestore.instance.collection("chats").doc(chatId));
+                  List<dynamic> messagesArray = snapshot.get("messages");
 
-                List<dynamic> messagesArray = snapshot.get("messages");
+                  // Remove the message from the array
+                  messagesArray.removeAt(index);
 
-                // Remove the message from the array
-                messagesArray.removeAt(index);
+                  // Insert the updated message at the original index
+                  messagesArray.insert(index, updatedMessage);
 
-                // Insert the updated message at the original index
-                messagesArray.insert(index, updatedMessage);
-
-                // Update the "messages" array field in Firestore
-                transaction.update(
-                    FirebaseFirestore.instance.collection("chats").doc(chatId),
-                    {"messages": messagesArray});
+                  // Update the "messages" array field in Firestore
+                  transaction.update(
+                      FirebaseFirestore.instance
+                          .collection("chats")
+                          .doc(chatId),
+                      {"messages": messagesArray});
+                });
               });
             }
 
+            bool isCurrentMessageRead = messages[index]["read"];
+
+            bool isRead = isCurrentMessageRead;
+
+            if (index > 0) {
+              bool isPreviousMessageRead = messages[index - 1]["read"];
+
+              if (!isRead && isCurrentMessageRead == isPreviousMessageRead) {
+                isRead = true;
+              }
+            }
 
             String currentDate = messages[index]["timestamp"]
                 .toDate()
@@ -116,11 +128,11 @@ class ShowMessages extends StatelessWidget {
                 showDayIndicator
                     ? DayIndicator(day: currentDate)
                     : const SizedBox(),
-                messages[index]["read"] == false &&
-                        messages[index]["uid"] !=
-                            FirebaseAuth.instance.currentUser!.uid
+
+                !isRead && FirebaseAuth.instance.currentUser!.uid != messages[index]["uid"]
                     ? const UnreadIndicator()
                     : const SizedBox(),
+
                 MessageTile(
                   message: messages[index]["message"],
                   uid: messages[index]["uid"],

@@ -1,10 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:true_chat_app/pages/groups/group_info_page.dart';
 import 'package:true_chat_app/utils/day_indicator.dart';
 import 'package:true_chat_app/utils/my_text_field.dart';
 import 'package:true_chat_app/utils/tiles/message_tile.dart';
+import 'package:true_chat_app/utils/unread_indicator.dart';
 
 class GroupChatPage extends StatefulWidget {
   final Stream<DocumentSnapshot<Map<String, dynamic>>> group;
@@ -99,6 +101,48 @@ class _GroupChatPageState extends State<GroupChatPage> {
                   return ListView.builder(
                     itemCount: messages.length,
                     itemBuilder: (context, index) {
+                      List read = messages[index]["read"];
+
+                      if (!read
+                          .contains(FirebaseAuth.instance.currentUser!.uid)) {
+                        Future.delayed(const Duration(seconds: 2), () {
+                          read.add(FirebaseAuth.instance.currentUser!.uid);
+
+                          var updatedMessage = {
+                            "message": messages[index]["message"],
+                            "uid": messages[index]["uid"],
+                            "sender": messages[index]["sender"],
+                            "photoURL": messages[index]["photoURL"],
+                            "timestamp": messages[index]["timestamp"],
+                            "read": read,
+                          };
+
+                          FirebaseFirestore.instance
+                              .runTransaction((transaction) async {
+                            DocumentSnapshot snapshot = await transaction.get(
+                                FirebaseFirestore.instance
+                                    .collection("groups")
+                                    .doc(groupID));
+
+                            List<dynamic> messagesArray =
+                                snapshot.get("messages");
+
+                            // Remove the message from the array
+                            messagesArray.removeAt(index);
+
+                            // Insert the updated message at the original index
+                            messagesArray.insert(index, updatedMessage);
+
+                            // Update the "messages" array field in Firestore
+                            transaction.update(
+                                FirebaseFirestore.instance
+                                    .collection("groups")
+                                    .doc(groupID),
+                                {"messages": messagesArray});
+                          });
+                        });
+                      }
+
                       String currentDate = messages[index]["timestamp"]
                           .toDate()
                           .toString()
@@ -119,8 +163,12 @@ class _GroupChatPageState extends State<GroupChatPage> {
 
                       return Column(
                         children: [
-                          showDayIndicator ? DayIndicator(day: currentDate) : Container(),
-
+                          read.contains(FirebaseAuth.instance.currentUser!.uid)
+                              ? const SizedBox()
+                              : const UnreadIndicator(),
+                          showDayIndicator
+                              ? DayIndicator(day: currentDate)
+                              : Container(),
                           MessageTile(
                             message: messages[index]["message"],
                             uid: messages[index]["uid"],
@@ -157,17 +205,19 @@ class _GroupChatPageState extends State<GroupChatPage> {
                   .collection("groups")
                   .doc(groupID)
                   .update({
-                    "messages": FieldValue.arrayUnion([
-                      {
-                        "uid": FirebaseAuth.instance.currentUser!.uid,
-                        "sender": FirebaseAuth.instance.currentUser!.displayName,
-                        "photoURL": FirebaseAuth.instance.currentUser!.photoURL,
-                        "message": messageController.text,
-                        "timestamp": DateTime.now(),
-                        "read": [],
-                      }
-                    ])
-                  });
+                "messages": FieldValue.arrayUnion([
+                  {
+                    "uid": FirebaseAuth.instance.currentUser!.uid,
+                    "sender": FirebaseAuth.instance.currentUser!.displayName,
+                    "photoURL": FirebaseAuth.instance.currentUser!.photoURL,
+                    "message": messageController.text,
+                    "timestamp": DateTime.now(),
+                    "read": [
+                      FirebaseAuth.instance.currentUser!.uid,
+                    ],
+                  }
+                ])
+              });
 
               messageController.clear();
             },

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:true_chat_app/functions/display_timestamp.dart';
 
@@ -23,15 +24,26 @@ class GroupTile extends StatelessWidget {
 
         final messages = snapshot.data!.get("messages") as List<dynamic>;
 
-
+        final bool read = messages.last["read"]
+            .contains(FirebaseAuth.instance.currentUser!.uid);
 
         final subtitle = messages.isEmpty
             ? const Text("No messages yet")
             : Text(
                 "${messages.last["sender"]}: ${messages.last["message"]}",
+                style: TextStyle(
+                  fontWeight: read ? FontWeight.normal : FontWeight.bold,
+                ),
               );
 
-        final trailing = messages.isEmpty ? null : Text(displayTimeStamp(messages.last["timestamp"].toDate()));
+        final trailing = messages.isEmpty
+            ? null
+            : Text(
+              displayTimeStamp(messages.last["timestamp"].toDate()),
+              style: TextStyle(
+                fontWeight: read ? FontWeight.normal : FontWeight.bold,
+              ),
+            );
 
         return ListTile(
           leading: CircleAvatar(
